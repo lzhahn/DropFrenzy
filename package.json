@@ -1,0 +1,21 @@
+{
+  "name": "drop-frenzy",
+  "version": "0.1.0",
+  "description": "A browser-based endless game where items drop from the top of the screen. Players collect items by clicking or through passive upgrades.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["game", "browser-game", "clicker", "idle"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  }
+}

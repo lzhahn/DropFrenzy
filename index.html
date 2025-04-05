@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drop Frenzy</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="icon" type="image/svg+xml" href="/images/favicon.svg">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Drop Frenzy</h1>
+      <div id="currency-display">
+        <span id="currency-value">0</span>
+        <span id="currency-label">coins</span>
+      </div>
+    </header>
+    
+    <main>
+      <div id="game-container">
+        <!-- Items will be dynamically added here -->
+      </div>
+      
+      <aside id="upgrades-panel">
+        <h2>Upgrades</h2>
+        <div id="upgrades-list">
+          <!-- Upgrades will be dynamically added here -->
+        </div>
+      </aside>
+    </main>
+    
+    <footer>
+      <button id="settings-button">Settings</button>
+      <div id="version">v0.1.0</div>
+    </footer>
+  </div>
+  
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

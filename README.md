@@ -16,6 +16,28 @@ Drop Frenzy is a web-based idle/clicker game with the following features:
 - [Product Requirements Document (PRD.md)](./PRD.md) - Detailed game specifications
 - [Implementation Checklist (todo.md)](./todo.md) - Development tasks and progress tracking
 
+## Project Structure
+
+```
+drop-frenzy/
+├── src/               # Source code
+│   ├── ts/            # TypeScript files
+│   ├── js/            # JavaScript files (compiled from TS)
+│   └── utils/         # Utility functions
+├── assets/            # Static assets
+│   ├── images/        # Game images and sprites
+│   └── audio/         # Sound effects and music
+├── styles/            # CSS styles
+│   ├── components/    # Component-specific styles
+│   └── pages/         # Page-specific styles
+├── components/        # Reusable UI components
+│   ├── game/          # Game-specific components
+│   └── ui/            # General UI components
+├── index.html         # Main HTML file
+├── PRD.md             # Product Requirements Document
+└── todo.md            # Implementation Checklist
+```
+
 ## Getting Started
 
 1. Clone this repository
@@ -25,7 +47,7 @@ Drop Frenzy is a web-based idle/clicker game with the following features:
 
 ## Tech Stack
 
-- HTML5, CSS, JavaScript
+- HTML5, CSS, TypeScript
 - Graphics: DOM elements or Canvas (PixiJS / p5.js)
 - Save System: LocalStorage
 - Responsive design for desktop and mobile browsers

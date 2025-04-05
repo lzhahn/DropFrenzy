@@ -1,11 +1,11 @@
 # ✅ Drop Frenzy - Implementation Checklist
 
 ## 🎯 Project Setup
-- [ ] Set up project folder structure (`/src`, `/assets`, `/styles`, `/components`)
-- [ ] Initialize with HTML/CSS/JS or framework (React, etc.)
-- [ ] Set up development environment (Vite, Webpack, CRA, etc.)
-- [ ] Set up Git version control
-- [ ] Create `index.html` with base layout
+- [x] Set up project folder structure (`/src`, `/assets`, `/styles`, `/components`)
+- [x] Initialize with HTML/CSS/TS or framework (React, etc.)
+- [x] Set up development environment (Vite, Webpack, CRA, etc.)
+- [x] Set up Git version control
+- [x] Create `index.html` with base layout
 
 ---
 
