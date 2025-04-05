@@ -107,10 +107,12 @@ export class UpgradeManager {
   }
   
   /**
-   * Add currency
+   * Add currency to the player's total
+   * @param amount Amount to add
    */
   addCurrency(amount: number): void {
-    this.currency += amount;
+    // Always round currency to ensure integer values
+    this.currency += Math.round(amount);
     this.onCurrencyChange(this.currency);
   }
   
@@ -139,6 +141,7 @@ export class UpgradeManager {
    */
   getValueMultiplier(): number {
     const multiplierUpgrade = this.getUpgradeByType(UpgradeType.MULTIPLIER) as MultiplierUpgrade;
+    // Simply return the base multiplier without any bonus from total upgrades
     return multiplierUpgrade ? Math.max(1, multiplierUpgrade.getValueMultiplier()) : 1;
   }
   
@@ -147,15 +150,23 @@ export class UpgradeManager {
    */
   getDropRateMultiplier(): number {
     const dropRateUpgrade = this.getUpgradeByType(UpgradeType.DROP_RATE) as DropRateUpgrade;
-    return dropRateUpgrade ? Math.max(1, dropRateUpgrade.getSpawnRateMultiplier()) : 1;
+    const baseMultiplier = dropRateUpgrade ? Math.max(1, dropRateUpgrade.getSpawnRateMultiplier()) : 1;
+    
+    // Apply a smaller bonus based on total upgrade levels
+    const totalLevels = this.getTotalUpgradeLevels();
+    const bonusMultiplier = 1 + (totalLevels * 0.005); // 0.5% bonus per total level
+    
+    return baseMultiplier * bonusMultiplier;
   }
   
   /**
-   * Get the current gravity/speed multiplier from upgrades
+   * Get the current gravity multiplier from upgrades
+   * Lower values mean slower falling speed
    */
   getGravityMultiplier(): number {
     const gravityUpgrade = this.getUpgradeByType(UpgradeType.GRAVITY) as GravityUpgrade;
-    return gravityUpgrade ? Math.max(0.5, gravityUpgrade.getSpeedMultiplier()) : 1;
+    // If gravity upgrade exists, apply the reduction factor, otherwise return 1 (no reduction)
+    return gravityUpgrade ? Math.max(0.2, gravityUpgrade.getSpeedReductionFactor()) : 1;
   }
   
   /**
@@ -163,14 +174,38 @@ export class UpgradeManager {
    */
   getCriticalChance(): number {
     const criticalUpgrade = this.getUpgradeByType(UpgradeType.CRITICAL_CHANCE) as CriticalChanceUpgrade;
-    return criticalUpgrade ? criticalUpgrade.getCriticalChance() : 0;
+    const baseCritChance = criticalUpgrade ? criticalUpgrade.getCriticalChance() : 0;
+    
+    // Apply a small bonus based on total upgrade levels
+    const totalLevels = this.getTotalUpgradeLevels();
+    const bonusCritChance = totalLevels * 0.002; // 0.2% bonus per total level
+    
+    return Math.min(1, baseCritChance + bonusCritChance); // Cap at 100%
   }
   
   /**
-   * Get the current auto-clicker clicks per second
+   * Get the current auto-click rate in clicks per second
    */
   getAutoClickRate(): number {
     const autoClickerUpgrade = this.getUpgradeByType(UpgradeType.AUTOCLICKER) as AutoClickerUpgrade;
+    // Simply return the base click rate without any bonus from total upgrades
     return autoClickerUpgrade ? autoClickerUpgrade.getClicksPerSecond() : 0;
+  }
+  
+  /**
+   * Get the critical hit multiplier
+   */
+  getCriticalMultiplier(): number {
+    const criticalUpgrade = this.getUpgradeByType(UpgradeType.CRITICAL_CHANCE) as CriticalChanceUpgrade;
+    return criticalUpgrade ? criticalUpgrade.getCriticalMultiplier() : 3.0;
+  }
+  
+  /**
+   * Calculate the total levels across all upgrades
+   * Used for bonus scaling effects
+   */
+  private getTotalUpgradeLevels(): number {
+    return Array.from(this.upgrades.values())
+      .reduce((total, upgrade) => total + upgrade.level, 0);
   }
 }

@@ -11,6 +11,8 @@ export class Item {
   
   // Movement properties
   speed: number;
+  velocityX: number; // Horizontal velocity
+  maxHorizontalSpeed: number; // Maximum horizontal speed
   
   // Value properties
   baseValue: number;
@@ -46,6 +48,10 @@ export class Item {
     this.speed = speed;
     this.baseValue = baseValue;
     this.isCollected = false;
+    
+    // Initialize momentum properties
+    this.velocityX = (Math.random() - 0.5) * 20; // Random initial horizontal velocity
+    this.maxHorizontalSpeed = 30; // Maximum horizontal speed
     
     // Create the visual element
     this.element = document.createElement('div');
@@ -83,11 +89,35 @@ export class Item {
     
     // Move down based on speed and time elapsed
     this.y += this.speed * deltaTime;
+    
+    // Apply horizontal movement with momentum
+    this.x += this.velocityX * deltaTime;
+    
+    // Add slight swaying motion
+    this.velocityX += (Math.random() - 0.5) * 5 * deltaTime;
+    
+    // Limit horizontal speed
+    if (this.velocityX > this.maxHorizontalSpeed) {
+      this.velocityX = this.maxHorizontalSpeed;
+    } else if (this.velocityX < -this.maxHorizontalSpeed) {
+      this.velocityX = -this.maxHorizontalSpeed;
+    }
+    
+    // Bounce off the edges of the screen
+    const windowWidth = window.innerWidth;
+    if (this.x < this.width / 2) {
+      this.x = this.width / 2;
+      this.velocityX = Math.abs(this.velocityX) * 0.8; // Reduce speed slightly on bounce
+    } else if (this.x > windowWidth - this.width / 2) {
+      this.x = windowWidth - this.width / 2;
+      this.velocityX = -Math.abs(this.velocityX) * 0.8; // Reduce speed slightly on bounce
+    }
+    
     this.updatePosition();
     
     // Return whether the item is still within bounds
     // This will be checked by the game to determine if the item should be removed
-    return true;
+    return this.y < window.innerHeight + this.height;
   }
   
   /**

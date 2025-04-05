@@ -100,9 +100,6 @@ export class Game {
    * Apply effects from upgrades to the game
    */
   private applyUpgradeEffects(): void {
-    // Apply value multiplier
-    this.itemManager.setValueMultiplier(this.upgradeManager.getValueMultiplier());
-
     // Apply drop rate multiplier
     this.itemManager.setSpawnRateMultiplier(this.upgradeManager.getDropRateMultiplier());
 
@@ -114,55 +111,89 @@ export class Game {
    * Handle auto-clicker functionality
    */
   private handleAutoClicker(deltaTime: number): void {
-    const clicksPerSecond = this.upgradeManager.getAutoClickRate();
+    const itemsPerSecond = this.upgradeManager.getAutoClickRate();
 
-    if (clicksPerSecond <= 0) return;
+    if (itemsPerSecond <= 0) return;
 
     // Accumulate time for auto-clicks
     this.autoClickTimer += deltaTime;
 
-    // Calculate how many clicks should happen this frame
-    const clickInterval = 1 / clicksPerSecond;
-    const clicksToPerform = Math.floor(this.autoClickTimer / clickInterval);
+    // Calculate how many items should be collected this frame
+    // Use a more precise calculation that accounts for fractional items
+    const itemsToCollect = Math.floor(itemsPerSecond * this.autoClickTimer);
 
-    if (clicksToPerform > 0) {
-      // Reduce the timer by the time used for clicks
-      this.autoClickTimer -= clicksToPerform * clickInterval;
+    if (itemsToCollect > 0) {
+      // Reduce the timer by the time used for collection
+      // This ensures we don't lose fractional time
+      this.autoClickTimer -= itemsToCollect / itemsPerSecond;
 
-      // Perform the auto-clicks
-      for (let i = 0; i < clicksToPerform; i++) {
-        this.performAutoClick();
-      }
+      // Collect multiple items at once
+      this.collectMultipleItems(itemsToCollect);
     }
   }
 
   /**
-   * Perform an auto-click at a random position with an active item
+   * Collect multiple items at once using the auto-clicker
    */
-  private performAutoClick(): void {
-    // Get a random item to click on
-    const items = Array.from(this.itemManager['items'].values());
+  private collectMultipleItems(count: number): void {
+    // Get all available items that haven't been collected yet
+    const items = Array.from(this.itemManager['items'].values())
+      .filter(item => !item.isCollected);
 
     if (items.length === 0) return;
 
-    // Select a random item
-    const randomItem = items[Math.floor(Math.random() * items.length)];
+    // Determine how many items to actually collect (limited by available items)
+    const itemsToCollect = Math.min(count, items.length);
+    
+    // Sort items by how close they are to the bottom of the screen
+    // This prioritizes items that are about to disappear
+    items.sort((a, b) => b.y - a.y);
+    
+    // Collect the determined number of items
+    let collectedCount = 0;
+    for (let i = 0; i < items.length && collectedCount < itemsToCollect; i++) {
+      const item = items[i];
+      
+      // Skip if the item has already been collected
+      if (item.isCollected) continue;
+      
+      // Calculate the center point of the item
+      const centerX = item.x + item.width / 2;
+      const centerY = item.y + item.height / 2;
+      
+      // Collect the item directly using its center point
+      const value = this.itemManager.collectItemAt(centerX, centerY);
 
-    // Collect the item
-    const value = this.itemManager.collectItemAt(
-      randomItem.x + randomItem.width / 2,
-      randomItem.y + randomItem.height / 2
-    );
+      if (value > 0) {
+        collectedCount++;
+        
+        // Apply the value multiplier from upgrade manager
+        const valueMultiplier = this.upgradeManager.getValueMultiplier();
+        let finalValue = Math.round(value * valueMultiplier);
+        
+        // Check for critical hit based on upgrade
+        const criticalChance = this.upgradeManager.getCriticalChance();
 
-    if (value > 0) {
-      // If an item was collected, add its value to currency
-      this.addCurrency(value);
+        if (Math.random() < criticalChance) {
+          // Critical hit! Use the multiplier from upgrade manager
+          const critMultiplier = this.upgradeManager.getCriticalMultiplier();
+          finalValue = Math.round(finalValue * critMultiplier);
 
-      // Create visual feedback at the item's position
-      this.createClickFeedback(
-        randomItem.x + randomItem.width / 2,
-        randomItem.y + randomItem.height / 2
-      );
+          // Create visual feedback at the item's position
+          this.createCriticalHitFeedback(centerX, centerY);
+        } else {
+          // Create regular collection feedback
+          this.createCollectionFeedback(centerX, centerY, finalValue);
+        }
+
+        // If an item was collected, add its value to currency
+        this.addCurrency(finalValue);
+      }
+    }
+    
+    // Debug logging to help identify issues
+    if (collectedCount === 0 && items.length > 0) {
+      console.log(`Auto collector failed to collect any items. Available: ${items.length}, Attempted: ${itemsToCollect}`);
     }
   }
 
@@ -174,16 +205,23 @@ export class Game {
     const value = this.itemManager.collectItemAt(event.clientX, event.clientY);
 
     if (value > 0) {
+      // Apply the value multiplier from upgrade manager
+      const valueMultiplier = this.upgradeManager.getValueMultiplier();
+      let finalValue = Math.round(value * valueMultiplier);
+      
       // Check for critical hit based on upgrade
       const criticalChance = this.upgradeManager.getCriticalChance();
-      let finalValue = value;
 
       if (Math.random() < criticalChance) {
-        // Critical hit! Triple the value
-        finalValue = value * 3;
+        // Critical hit! Use the multiplier from upgrade manager
+        const critMultiplier = this.upgradeManager.getCriticalMultiplier();
+        finalValue = Math.round(finalValue * critMultiplier);
 
         // Show critical hit feedback
         this.createCriticalHitFeedback(event.clientX, event.clientY);
+      } else {
+        // Show regular collection feedback
+        this.createCollectionFeedback(event.clientX, event.clientY, finalValue);
       }
 
       // If an item was collected, add its value to currency
@@ -207,7 +245,9 @@ export class Game {
    */
   private updateCurrencyDisplay(): void {
     if (this.currencyDisplay) {
-      this.currencyDisplay.textContent = this.upgradeManager.getCurrency().toString();
+      // Ensure currency is always displayed as an integer
+      const currency = Math.floor(this.upgradeManager.getCurrency());
+      this.currencyDisplay.textContent = currency.toString();
     }
   }
 
@@ -252,5 +292,27 @@ export class Game {
         this.container.removeChild(feedback);
       }
     }, 800);
+  }
+
+  /**
+   * Create collection feedback at click position
+   */
+  private createCollectionFeedback(x: number, y: number, value: number): void {
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'collection-feedback';
+    feedback.style.left = `${x}px`;
+    feedback.style.top = `${y}px`;
+    feedback.textContent = `+${value}`;
+
+    // Add to container
+    this.container.appendChild(feedback);
+
+    // Remove after animation
+    setTimeout(() => {
+      if (feedback.parentNode === this.container) {
+        this.container.removeChild(feedback);
+      }
+    }, 500);
   }
 }

@@ -44,13 +44,25 @@ export class UpgradePanel {
       return;
     }
     
-    // Get all upgrades from the manager
-    const upgrades = this.upgradeManager.getAllUpgrades();
+    // Get all upgrades from the manager and sort them by cost
+    this.renderSortedUpgrades(upgradesContainer);
+  }
+  
+  /**
+   * Sort upgrades by cost and render them
+   */
+  private renderSortedUpgrades(container: HTMLElement): void {
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Get all upgrades and sort them by cost
+    const upgrades = this.upgradeManager.getAllUpgrades()
+      .sort((a, b) => a.getCurrentCost() - b.getCurrentCost());
     
     // Create UI elements for each upgrade
     upgrades.forEach(upgrade => {
       const upgradeElement = this.createUpgradeElement(upgrade);
-      upgradesContainer.appendChild(upgradeElement);
+      container.appendChild(upgradeElement);
       this.upgradeElements.set(upgrade.id, upgradeElement);
     });
   }
@@ -179,9 +191,38 @@ export class UpgradePanel {
    */
   private updateUpgradeUI(): void {
     const upgrades = this.upgradeManager.getAllUpgrades();
+    
+    // First update all upgrade elements
     upgrades.forEach(upgrade => {
       this.updateUpgradeElement(upgrade);
     });
+    
+    // Check if we need to resort based on cost changes
+    const sortedUpgrades = [...upgrades].sort((a, b) => a.getCurrentCost() - b.getCurrentCost());
+    const currentOrder = upgrades.map(u => u.id);
+    const sortedOrder = sortedUpgrades.map(u => u.id);
+    
+    // Check if the order has changed
+    const needsResorting = !this.arraysEqual(currentOrder, sortedOrder);
+    
+    if (needsResorting) {
+      // Re-render all upgrades in the sorted order
+      const upgradesContainer = this.panelElement.querySelector('#upgrades-list') as HTMLElement;
+      if (upgradesContainer) {
+        this.renderSortedUpgrades(upgradesContainer);
+      }
+    }
+  }
+  
+  /**
+   * Helper method to check if two arrays are equal
+   */
+  private arraysEqual(a: string[], b: string[]): boolean {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
   }
   
   /**
@@ -192,7 +233,7 @@ export class UpgradePanel {
     
     switch (upgrade.type) {
       case 'autoclicker':
-        return `${effect.toFixed(1)} clicks/sec`;
+        return `${effect.toFixed(1)} items/sec`;
       case 'multiplier':
         return `${effect.toFixed(1)}x value`;
       case 'drop_rate':
@@ -200,7 +241,7 @@ export class UpgradePanel {
       case 'gravity':
         return `${effect.toFixed(2)}x speed`;
       case 'critical_chance':
-        return `${(effect * 100).toFixed(0)}% chance`;
+        return `${(effect * 100).toFixed(1)}% chance`;
       default:
         return effect.toString();
     }

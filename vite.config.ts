@@ -10,7 +10,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    open: false, // Changed from true to false to prevent auto-opening browser
   },
   resolve: {
     alias: {

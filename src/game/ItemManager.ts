@@ -9,15 +9,14 @@ export class ItemManager {
   private nextItemId: number = 0;
   
   // Item spawn settings
-  private spawnInterval: number = 2; // seconds between spawns
+  private spawnInterval: number = 1.5; // seconds between spawns
   private timeSinceLastSpawn: number = 0;
-  private baseSpeed: number = 100; // pixels per second
+  private baseSpeed: number = 250; // pixels per second
   private baseValue: number = 1;
   
   // Item spawn rate modifiers (will be affected by upgrades)
-  private spawnRateMultiplier: number = 1;
+  private spawnRateMultiplier: number = 1.1;
   private speedMultiplier: number = 1;
-  private valueMultiplier: number = 1;
   
   constructor(container: HTMLElement) {
     this.container = container;
@@ -68,7 +67,7 @@ export class ItemManager {
       randomX,
       -20, // Start slightly above the window
       this.baseSpeed * this.speedMultiplier,
-      Math.floor(this.baseValue * this.valueMultiplier),
+      this.baseValue, // Use base value only, multiplier will be applied when collected
       this.container
     );
     
@@ -80,7 +79,7 @@ export class ItemManager {
   }
   
   /**
-   * Try to collect an item at the given coordinates
+   * Collect an item at the specified coordinates
    * @param x X coordinate
    * @param y Y coordinate
    * @returns The value of the collected item, or 0 if no item was collected
@@ -88,12 +87,22 @@ export class ItemManager {
   collectItemAt(x: number, y: number): number {
     // Check each item to see if it contains the point
     let collectedValue = 0;
+    let collectedItem = null;
     
-    this.items.forEach(item => {
+    // First, find the item that contains the point
+    for (const item of this.items.values()) {
       if (!item.isCollected && item.containsPoint(x, y)) {
-        collectedValue += item.collect();
+        collectedItem = item;
+        break;
       }
-    });
+    }
+    
+    // If we found an item, collect it
+    if (collectedItem) {
+      // Get the base value without applying multiplier here
+      // The Game class will apply the appropriate multipliers
+      collectedValue = collectedItem.collect();
+    }
     
     return collectedValue;
   }
@@ -133,14 +142,6 @@ export class ItemManager {
    */
   setSpeedMultiplier(multiplier: number): void {
     this.speedMultiplier = Math.max(1, multiplier);
-  }
-  
-  /**
-   * Set the value multiplier (affected by upgrades)
-   * @param multiplier New value multiplier
-   */
-  setValueMultiplier(multiplier: number): void {
-    this.valueMultiplier = Math.max(1, multiplier);
   }
   
   /**
