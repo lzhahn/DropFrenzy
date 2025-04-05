@@ -12,22 +12,22 @@
 ## 🎮 Core Game Loop
 
 ### ⬇️ Item Drop System
-- [ ] Define item object (position, speed, value, ID)
-- [ ] Spawn items at random X-positions
-- [ ] Implement timed loop to spawn new items
-- [ ] Animate items falling down the screen
-- [ ] Despawn items when offscreen
+- [x] Define item object (position, speed, value, ID)
+- [x] Spawn items at random X-positions
+- [x] Implement timed loop to spawn new items
+- [x] Animate items falling down the screen
+- [x] Despawn items when offscreen
 
 ### 👆 Click Detection
-- [ ] Detect mouse click or touch on falling item
-- [ ] Remove item and increase currency on click
-- [ ] Add hitbox/collision detection
-- [ ] Add visual + audio feedback on collection
+- [x] Detect mouse click or touch on falling item
+- [x] Remove item and increase currency on click
+- [x] Add hitbox/collision detection
+- [x] Add visual + audio feedback on collection
 
 ### 💰 Currency System
-- [ ] Create currency variable
-- [ ] Add function to increase currency
-- [ ] Display currency in UI
+- [x] Create currency variable
+- [x] Add function to increase currency
+- [x] Display currency in UI
 
 ---
 
@@ -103,6 +103,7 @@
 ---
 
 ## 🧪 Testing & Optimization
+- [x] Unit tests for core components (Item, ItemManager, Game)
 - [ ] Test on Chrome, Firefox, Edge (desktop)
 - [ ] Test on Safari, Chrome (mobile)
 - [ ] Optimize performance for high item count
