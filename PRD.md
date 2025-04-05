@@ -1,97 +1,127 @@
+# Drop Frenzy - Product Requirements Document (PRD)
 
-# 📝 Product Requirements Document
+## 1. Overview
 
-## 🧠 Project Title:
-**ClickStorm** *(working title)*
+**Objective**  
+Create a browser-based endless game where items drop from the top of the screen. Players collect items by clicking or through passive upgrades. The game intensifies over time as players unlock upgrades like autoclickers, multipliers, and drop frequency boosts.
 
----
+**Platform**  
+- Web (desktop and mobile browser support)
 
-## 💡 Objective:
-Create a simple, addictive web/mobile game where users click on falling objects to gain points. The goal is to test reaction speed, hand-eye coordination, and just kill time in the most satisfying way possible.
-
----
-
-## 🎯 Core Features:
-
-### 1. Falling Objects Engine
-- Objects fall from the top of the screen at random x-positions.
-- Object types can vary (e.g., apples, bombs, golden stars).
-- Objects fall at increasing speed as time passes (difficulty scaling).
-
-### 2. Click Interaction
-- Clicking an object gives you points.
-- Some objects give more points than others (rarity system).
-- Some objects (like bombs) deduct points or end the game.
-
-### 3. Score System
-- Score displayed in real-time at top of screen.
-- Bonus streaks for multiple fast clicks.
-- Leaderboard integration (optional for MVP).
-
-### 4. Game States
-- Start screen → Game screen → Game over screen.
-- Game over screen shows final score and "Play Again" button.
-
-### 5. Visuals & Sounds
-- Simple and cute animations (bounce on click, splat on miss, etc).
-- Fun sound effects per object.
-- Background music (optional toggle).
+**Monetization**  
+- None (no ads, no purchases)
 
 ---
 
-## 🔧 MVP Requirements:
+## 2. Game Loop
 
-| Feature                | Included in MVP |
-|------------------------|------------------|
-| Falling objects        | ✅               |
-| Click-to-score         | ✅               |
-| Game timer or lives    | ✅               |
-| Score counter          | ✅               |
-| Start/Restart buttons  | ✅               |
-| Mobile + Desktop support | ✅             |
-| Sound toggle           | ✅               |
+### Core Loop
+1. Items fall from the top of the screen.
+2. Players click or tap to collect them.
+3. Each item adds to the player's currency.
+4. Currency is used to purchase upgrades.
+5. Upgrades increase game speed and automation.
 
----
-
-## 🧪 Stretch Features (Post-MVP):
-- Object types with unique behaviors (e.g., bouncy, splitting).
-- Power-ups (e.g., slow motion, score multiplier).
-- Skins/themes (e.g., spooky, space, candy).
-- User accounts for saving high scores.
-- Leaderboard + friend challenge mode.
-- Multiplayer mode (side-by-side click battles).
+### Endless Progression
+- No endgame; the goal is to progress as far as possible.
+- Players strive to beat personal milestones.
+- Optional prestige system adds long-term progression.
 
 ---
 
-## 📱 Platforms:
-- Web-based (HTML5, JavaScript, CSS)
-- Optional: Mobile version via wrapper (Capacitor/Cordova or PWA)
+## 3. Core Features
+
+### Falling Items
+- Randomized horizontal spawn and interval.
+- Drop rate increases over time or with upgrades.
+- Optional: Item variety with visual or mechanical impact.
+
+### Upgrades
+- **Autoclicker** – Automatically collects items at intervals.
+- **Multiplier** – Increases value per collected item.
+- **Drop Rate** – More items fall per second.
+- **Gravity Control** – Items fall faster (challenge-based reward).
+- **Critical Chance** – Random bonus multiplier per item.
+- **Prestige Reset** – Resets progress for permanent buffs.
+
+### Game Speed/Scaling
+- Difficulty and pace scale with player progression.
+- Upgrades have escalating cost and effect.
+- Visual and audio feedback reflects speed increase.
 
 ---
 
-## 🖼️ Wireframe (Simple View):
+## 4. Technical Stack
 
-```
-+----------------------------+
-|        Score: 215         |
-|                            |
-|       ⭐        🍎         |
-|                            |
-|     💣                    |
-|                            |
-|            🧠              |
-|                            |
-|     [PLAY AGAIN]          |
-+----------------------------+
-```
+- **Frontend:** HTML5, CSS, JavaScript (React or Vanilla)
+- **Graphics:** DOM elements or Canvas (PixiJS / p5.js if needed)
+- **Save System:** LocalStorage
+- **Responsiveness:** Touch support for mobile, mouse for desktop
 
 ---
 
-## ⏱️ Timeline:
+## 5. UI/UX Requirements
 
-| Phase             | Duration       |
-|------------------|----------------|
-| Design & Prototype | 1 week        |
-| Development MVP    | 2 weeks       |
-| Bug Fixes & Polish | 1 week        |
-| Launch             | Week 4        |
+### Main Game View
+- Falling items from top to bottom
+- Central clickable/tappable area
+- Minimalist, clean background
+
+### Upgrade Panel
+- Sidebar or modal
+- Lists upgrades, costs, current level, and effects
+- Tooltips or short descriptions
+
+### Progress Panel
+- Stats: items collected, value, clicks/sec, etc.
+- Prestige/reset button (if implemented)
+
+### Style Guide
+- Clean, bright visuals
+- Smooth animations
+- Clear feedback for actions
+
+---
+
+## 6. Art & Audio
+
+- **Art Style:** 2D vector or pixel art
+- **Sound FX:** Clicks, item collection, upgrade sounds
+- **Music:** Optional ambient loop that scales with game speed
+
+---
+
+## 7. Save & Persistence
+
+- Autosave every few seconds using LocalStorage
+- Manual reset and hard reset buttons
+- Optional: export/import save as JSON
+
+---
+
+## 8. Metrics (Internal Use Only)
+
+- Items/sec peak
+- Longest session time
+- Most used upgrade
+- Prestige count (if applicable)
+
+---
+
+## 9. Development Roadmap
+
+### MVP
+- Core drop and click mechanic
+- Basic upgrade system (3–4 types)
+- Currency accumulation
+- Basic art and sound
+- LocalStorage saving
+
+### Post-MVP
+- Prestige system
+- Item types/rarities
+- Background transitions
+- Optional offline progress
+- Local-only leaderboard (optional)
+
+---

@@ -1,50 +1,129 @@
+# ✅ Drop Frenzy - Implementation Checklist
 
-# ✅ ClickStorm Game Development - Step-by-Step To-Do List
-
----
-
-## Phase 1: Design & Planning (Week 1)
-- [ ] Define object types (e.g., apple, bomb, star).
-- [ ] Sketch basic wireframes for game states (Start, Game, Game Over).
-- [ ] Choose visual style (cartoon, retro, minimal, etc.).
-- [ ] Decide on sound effects and background music approach.
-- [ ] Finalize scoring system and object behavior rules.
+## 🎯 Project Setup
+- [ ] Set up project folder structure (`/src`, `/assets`, `/styles`, `/components`)
+- [ ] Initialize with HTML/CSS/JS or framework (React, etc.)
+- [ ] Set up development environment (Vite, Webpack, CRA, etc.)
+- [ ] Set up Git version control
+- [ ] Create `index.html` with base layout
 
 ---
 
-## Phase 2: Development MVP (Weeks 2-3)
+## 🎮 Core Game Loop
 
-### Core Game Engine
-- [ ] Implement falling object generator (random x-position, speed).
-- [ ] Create click detection and scoring system.
-- [ ] Program object-specific behaviors (e.g., bomb ends game).
-- [ ] Add increasing difficulty mechanic (objects fall faster over time).
+### ⬇️ Item Drop System
+- [ ] Define item object (position, speed, value, ID)
+- [ ] Spawn items at random X-positions
+- [ ] Implement timed loop to spawn new items
+- [ ] Animate items falling down the screen
+- [ ] Despawn items when offscreen
 
-### UI & Game States
-- [ ] Build Start screen with Play button.
-- [ ] Build Game screen with score display.
-- [ ] Build Game Over screen with final score and Play Again button.
+### 👆 Click Detection
+- [ ] Detect mouse click or touch on falling item
+- [ ] Remove item and increase currency on click
+- [ ] Add hitbox/collision detection
+- [ ] Add visual + audio feedback on collection
 
-### UX & Polish
-- [ ] Add animations for object click/miss.
-- [ ] Add sound effects for different object types.
-- [ ] Add music toggle button.
-- [ ] Optimize for desktop + mobile screens.
-
----
-
-## Phase 3: Testing & Polish (Week 4)
-- [ ] Playtest for bugs (click not registering, scoring errors, etc.).
-- [ ] Adjust object speed/difficulty scaling.
-- [ ] Improve touch controls for mobile.
-- [ ] Add simple responsive layout polish.
+### 💰 Currency System
+- [ ] Create currency variable
+- [ ] Add function to increase currency
+- [ ] Display currency in UI
 
 ---
 
-## Optional Stretch Features (Post-Launch)
-- [ ] Add leaderboard for high scores.
-- [ ] Add power-ups (slow motion, extra life).
-- [ ] Introduce new object types with unique behavior.
-- [ ] Add skins/themes (space, spooky, candy, etc.).
-- [ ] Implement user accounts to track scores.
-- [ ] Explore multiplayer click race mode.
+## 🛠️ Upgrades System
+
+### 📦 Upgrade Types
+- [ ] Define upgrade object structure (type, level, cost, effect)
+- [ ] Implement Autoclicker
+- [ ] Implement Multiplier
+- [ ] Implement Drop Rate increase
+- [ ] Implement Gravity Control
+- [ ] Implement Critical Chance
+
+### 🧩 Upgrade Logic
+- [ ] Create upgrade panel UI
+- [ ] Add purchase buttons and cost display
+- [ ] Deduct currency when purchasing
+- [ ] Apply effect immediately after purchase
+- [ ] Implement cost scaling per level
+
+### 🎨 Upgrade UX
+- [ ] Add tooltips or short descriptions
+- [ ] Show upgrade level and effect
+
+---
+
+## ⚙️ Game Scaling & Pacing
+- [ ] Link upgrades to speed, value, and frequency
+- [ ] Create scaling/difficulty curve (exponential/logarithmic)
+- [ ] Add visual cues as pace increases (blur, background, shake, etc.)
+
+---
+
+## 💾 Save & Persistence
+- [ ] Create save object (currency, upgrades, prestige)
+- [ ] Auto-save using LocalStorage every X seconds
+- [ ] Load saved data on page load
+- [ ] Add manual reset button
+- [ ] Add import/export save as JSON
+
+---
+
+## ✨ UI & Visuals
+
+### 📱 Game Interface
+- [ ] HUD with currency display
+- [ ] Main item drop area
+- [ ] Upgrade panel (side or bottom)
+- [ ] Settings button (reset, export)
+
+### 🖼️ Visual Feedback
+- [ ] Animate item collection (e.g., fade or pop)
+- [ ] Highlight affordable upgrades
+- [ ] Add visual effect for rare/critical items
+- [ ] Evolve background visuals over time
+
+---
+
+## 🔊 Audio
+- [ ] Add sound effects for click, upgrade, and critical
+- [ ] Add optional looping background music
+- [ ] Create mute/volume toggle
+
+---
+
+## 🔁 Prestige System (Post-MVP)
+- [ ] Define prestige conditions (e.g., currency threshold)
+- [ ] Reset player progress except permanent boosts
+- [ ] Add prestige currency + UI
+- [ ] Add scaling buffs unlocked through prestige
+- [ ] Add feedback for prestige action (visual/audio)
+
+---
+
+## 🧪 Testing & Optimization
+- [ ] Test on Chrome, Firefox, Edge (desktop)
+- [ ] Test on Safari, Chrome (mobile)
+- [ ] Optimize performance for high item count
+- [ ] Add FPS limiter or max item cap
+- [ ] Test and debug save/load
+- [ ] Test responsive UI on different screen sizes
+
+---
+
+## 🎁 Post-MVP Features
+- [ ] Add item types/rarities with unique visuals
+- [ ] Unlockable themes/backgrounds
+- [ ] Add player stats (items collected, upgrades, etc.)
+- [ ] Track session time or AFK mode
+- [ ] Add local leaderboard (optional)
+
+---
+
+## 🔄 Polish & Final Touches
+- [ ] Add favicon and metadata
+- [ ] Optional: Add PWA mobile support
+- [ ] Add easter eggs or secrets
+- [ ] Animate upgrade buttons when affordable
+- [ ] Add drop trails, sparkles, or other FX
