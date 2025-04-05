@@ -34,19 +34,19 @@
 ## 🛠️ Upgrades System
 
 ### 📦 Upgrade Types
-- [ ] Define upgrade object structure (type, level, cost, effect)
-- [ ] Implement Autoclicker
-- [ ] Implement Multiplier
-- [ ] Implement Drop Rate increase
-- [ ] Implement Gravity Control
-- [ ] Implement Critical Chance
+- [x] Define upgrade object structure (type, level, cost, effect)
+- [x] Implement Autoclicker
+- [x] Implement Multiplier
+- [x] Implement Drop Rate increase
+- [x] Implement Gravity Control
+- [x] Implement Critical Chance
 
 ### 🧩 Upgrade Logic
-- [ ] Create upgrade panel UI
-- [ ] Add purchase buttons and cost display
-- [ ] Deduct currency when purchasing
-- [ ] Apply effect immediately after purchase
-- [ ] Implement cost scaling per level
+- [x] Create upgrade panel UI
+- [x] Add purchase buttons and cost display
+- [x] Deduct currency when purchasing
+- [x] Apply effect immediately after purchase
+- [x] Implement cost scaling per level
 
 ### 🎨 Upgrade UX
 - [ ] Add tooltips or short descriptions
