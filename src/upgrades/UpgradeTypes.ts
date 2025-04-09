@@ -170,3 +170,29 @@ export class RisingBallsUpgrade extends BaseUpgrade {
     return 1.5; // Rising balls are worth 50% more
   }
 }
+
+/**
+ * RisingAutoClicker upgrade - automatically collects rising balls
+ */
+export class RisingAutoClickerUpgrade extends BaseUpgrade {
+  constructor() {
+    super(
+      'rising_auto_clicker',
+      UpgradeType.RISING_AUTO_CLICKER,
+      'Rising Auto-Clicker',
+      'Automatically collects rising balls',
+      30, // Base cost
+      1.35, // Cost multiplier
+      0.2, // Base effect (0.2 rising balls per second)
+      1.25, // Effect multiplier
+      20  // Max level
+    );
+  }
+  
+  /**
+   * Get the current auto-click rate for rising balls
+   */
+  getRisingAutoClickRate(): number {
+    return this.getCurrentEffect();
+  }
+}

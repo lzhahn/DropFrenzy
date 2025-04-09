@@ -244,6 +244,8 @@ export class UpgradePanel {
         return `${(effect * 100).toFixed(1)}% chance`;
       case 'rising_balls':
         return `${(effect * 100).toFixed(1)}% chance, 1.5x value`;
+      case 'rising_auto_clicker':
+        return `${effect.toFixed(1)} rising items/sec`;
       default:
         return effect.toString();
     }

@@ -5,7 +5,8 @@ import {
   DropRateUpgrade, 
   GravityUpgrade, 
   CriticalChanceUpgrade,
-  RisingBallsUpgrade
+  RisingBallsUpgrade,
+  RisingAutoClickerUpgrade
 } from './UpgradeTypes';
 
 /**
@@ -35,7 +36,8 @@ export class UpgradeManager {
       new DropRateUpgrade(),
       new GravityUpgrade(),
       new CriticalChanceUpgrade(),
-      new RisingBallsUpgrade()
+      new RisingBallsUpgrade(),
+      new RisingAutoClickerUpgrade()
     ];
     
     // Add all upgrades to the map
@@ -216,6 +218,14 @@ export class UpgradeManager {
   getRisingValueMultiplier(): number {
     const upgrade = this.getUpgradeByType(UpgradeType.RISING_BALLS) as RisingBallsUpgrade;
     return upgrade ? upgrade.getRisingValueMultiplier() : 1.0;
+  }
+
+  /**
+   * Get the auto-click rate for rising balls
+   */
+  getRisingAutoClickRate(): number {
+    const upgrade = this.getUpgradeByType(UpgradeType.RISING_AUTO_CLICKER) as RisingAutoClickerUpgrade;
+    return upgrade ? upgrade.getRisingAutoClickRate() : 0;
   }
   
   /**

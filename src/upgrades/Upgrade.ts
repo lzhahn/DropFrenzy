@@ -7,7 +7,8 @@ export enum UpgradeType {
   DROP_RATE = 'drop_rate',
   GRAVITY = 'gravity',
   CRITICAL_CHANCE = 'critical_chance',
-  RISING_BALLS = 'rising_balls'
+  RISING_BALLS = 'rising_balls',
+  RISING_AUTO_CLICKER = 'rising_auto_clicker'
 }
 
 /**

@@ -14,6 +14,7 @@ export class Game {
   private upgradeManager: UpgradeManager;
   private particleManager: ParticleManager;
   private autoClickTimer: number = 0;
+  private risingAutoClickTimer: number = 0; // Timer for rising auto-clicker
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -95,8 +96,11 @@ export class Game {
     // Update items and get missed items
     this.itemManager.update(deltaTime, this.upgradeManager.getRisingChance());
     
-    // Handle auto-clicker
+    // Handle regular auto-clicker
     this.handleAutoClicker(deltaTime);
+    
+    // Handle rising auto-clicker
+    this.handleRisingAutoClicker(deltaTime);
   }
 
   /**
@@ -136,12 +140,37 @@ export class Game {
   }
 
   /**
+   * Handle rising auto-clicker functionality
+   */
+  private handleRisingAutoClicker(deltaTime: number): void {
+    const itemsPerSecond = this.upgradeManager.getRisingAutoClickRate();
+
+    if (itemsPerSecond <= 0) return;
+
+    // Accumulate time for auto-clicks
+    this.risingAutoClickTimer += deltaTime;
+
+    // Calculate how many items should be collected this frame
+    // Use a more precise calculation that accounts for fractional items
+    const itemsToCollect = Math.floor(itemsPerSecond * this.risingAutoClickTimer);
+
+    if (itemsToCollect > 0) {
+      // Reduce the timer by the time used for collection
+      // This ensures we don't lose fractional time
+      this.risingAutoClickTimer -= itemsToCollect / itemsPerSecond;
+
+      // Collect multiple items at once
+      this.collectMultipleRisingItems(itemsToCollect);
+    }
+  }
+
+  /**
    * Collect multiple items at once using the auto-clicker
    */
   private collectMultipleItems(count: number): void {
-    // Get all available items that haven't been collected yet
+    // Get all available falling items that haven't been collected yet
     const items = Array.from(this.itemManager['items'].values())
-      .filter(item => !item.isCollected);
+      .filter(item => !item.isRising && !item.isCollected);
 
     if (items.length === 0) return;
 
@@ -150,18 +179,48 @@ export class Game {
     
     // Sort items by how close they are to the bottom of the screen
     // This makes the auto-clicker prioritize items that are about to be missed
-    items.sort((a, b) => {
-      if (a.isRising && !b.isRising) return -1; // Prioritize rising items
-      if (!a.isRising && b.isRising) return 1;
+    items.sort((a, b) => b.y - a.y);
+
+    // Collect the items
+    let totalValue = 0;
+    const valueMultiplier = this.upgradeManager.getValueMultiplier();
+    
+    for (let i = 0; i < itemsToCollect; i++) {
+      const item = items[i];
       
-      if (a.isRising) {
-        // For rising items, prioritize ones closer to the top (lower y value)
-        return a.y - b.y;
-      } else {
-        // For falling items, prioritize ones closer to the bottom (higher y value)
-        return b.y - a.y;
-      }
-    });
+      // Mark the item as collected
+      item.collect();
+      
+      // Apply the regular value multiplier
+      let itemValue = item.getValue();
+      totalValue += Math.round(itemValue * valueMultiplier);
+      
+      // Create a collection effect at the item's position
+      this.createCollectionFeedback(item.x + item.width / 2, item.y + item.height / 2, Math.round(itemValue * valueMultiplier));
+    }
+
+    // Add the total value to currency
+    if (totalValue > 0) {
+      this.addCurrency(totalValue);
+    }
+  }
+
+  /**
+   * Collect multiple rising items at once using the auto-clicker
+   */
+  private collectMultipleRisingItems(count: number): void {
+    // Get all available rising items that haven't been collected yet
+    const items = Array.from(this.itemManager['items'].values())
+      .filter(item => item.isRising && !item.isCollected);
+
+    if (items.length === 0) return;
+
+    // Determine how many items to actually collect (limited by available items)
+    const itemsToCollect = Math.min(count, items.length);
+    
+    // Sort items by how close they are to the top of the screen
+    // This makes the auto-clicker prioritize items that are about to be missed
+    items.sort((a, b) => a.y - b.y);
 
     // Collect the items
     let totalValue = 0;
@@ -176,9 +235,7 @@ export class Game {
       
       // Apply value multiplier for rising items
       let itemValue = item.getValue();
-      if (item.isRising) {
-        itemValue *= risingValueMultiplier;
-      }
+      itemValue *= risingValueMultiplier;
       
       // Apply the regular value multiplier
       totalValue += Math.round(itemValue * valueMultiplier);
