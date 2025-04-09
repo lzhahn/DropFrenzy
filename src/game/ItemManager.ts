@@ -175,6 +175,11 @@ export class ItemManager {
       // Apply value multiplier for rising items
       const valueMultiplier = collectedItem.isRising ? risingValueMultiplier : 1.0;
       
+      // Remove the item from the items map after a delay to match the animation
+      setTimeout(() => {
+        this.items.delete(collectedItem.id);
+      }, 500);
+      
       // Return the base value of the item (will be multiplied by the game's value multiplier)
       collectedValue = collectedItem.getValue() * valueMultiplier;
     }
@@ -217,6 +222,14 @@ export class ItemManager {
    */
   setSpeedMultiplier(multiplier: number): void {
     this.speedMultiplier = Math.max(1, multiplier);
+  }
+  
+  /**
+   * Get the number of active items
+   * @returns The count of active items
+   */
+  getActiveItemCount(): number {
+    return this.items.size;
   }
   
   /**

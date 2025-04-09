@@ -15,6 +15,11 @@ export class Game {
   private particleManager: ParticleManager;
   private autoClickTimer: number = 0;
   private risingAutoClickTimer: number = 0; // Timer for rising auto-clicker
+  
+  // Visual cue properties
+  private backgroundIntensity: number = 0;
+  private shakeIntensity: number = 0;
+  private originalBackgroundColor: string = '';
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -26,6 +31,9 @@ export class Game {
     this.upgradeManager = new UpgradeManager(0, () => {
       this.updateCurrencyDisplay();
     });
+    
+    // Store the original background color
+    this.originalBackgroundColor = window.getComputedStyle(document.body).backgroundColor;
 
     this.init();
   }
@@ -66,6 +74,13 @@ export class Game {
    */
   public stop(): void {
     this.isRunning = false;
+    
+    // Reset visual effects
+    this.backgroundIntensity = 0;
+    this.shakeIntensity = 0;
+    document.body.style.backgroundColor = this.originalBackgroundColor;
+    this.container.style.transform = 'translate(0px, 0px)';
+    
     console.log('Game stopped');
   }
 
@@ -101,6 +116,9 @@ export class Game {
     
     // Handle rising auto-clicker
     this.handleRisingAutoClicker(deltaTime);
+    
+    // Update visual cues based on active item count
+    this.updateVisualCues();
   }
 
   /**
@@ -168,7 +186,7 @@ export class Game {
    * Collect multiple items at once using the auto-clicker
    */
   private collectMultipleItems(count: number): void {
-    // Get all available falling items that haven't been collected yet
+    // Get all available items that haven't been collected yet
     const items = Array.from(this.itemManager['items'].values())
       .filter(item => !item.isRising && !item.isCollected);
 
@@ -191,12 +209,16 @@ export class Game {
       // Mark the item as collected
       item.collect();
       
-      // Apply the regular value multiplier
-      let itemValue = item.getValue();
-      totalValue += Math.round(itemValue * valueMultiplier);
+      // Apply the value multiplier
+      totalValue += Math.round(item.getValue() * valueMultiplier);
       
       // Create a collection effect at the item's position
-      this.createCollectionFeedback(item.x + item.width / 2, item.y + item.height / 2, Math.round(itemValue * valueMultiplier));
+      this.createCollectionFeedback(item.x + item.width / 2, item.y + item.height / 2, Math.round(item.getValue() * valueMultiplier));
+      
+      // Remove the item from the items map after a delay to match the animation
+      setTimeout(() => {
+        this.itemManager['items'].delete(item.id);
+      }, 500);
     }
 
     // Add the total value to currency
@@ -242,6 +264,11 @@ export class Game {
       
       // Create a collection effect at the item's position
       this.createCollectionFeedback(item.x + item.width / 2, item.y + item.height / 2, Math.round(itemValue * valueMultiplier));
+      
+      // Remove the item from the items map after a delay to match the animation
+      setTimeout(() => {
+        this.itemManager['items'].delete(item.id);
+      }, 500);
     }
 
     // Add the total value to currency
@@ -380,5 +407,66 @@ export class Game {
         this.container.removeChild(feedback);
       }
     }, 500);
+  }
+
+  /**
+   * Update visual cues based on active item count
+   */
+  private updateVisualCues(): void {
+    const activeItemCount = this.itemManager.getActiveItemCount();
+    
+    // Debug: log active item count
+    console.log(`Active items: ${activeItemCount}`);
+    
+    // Calculate intensity based on active item count
+    // Start changing at 10 items, max intensity at 50 items
+    const baseIntensity = Math.min(1, Math.max(0, (activeItemCount - 10) / 40));
+    
+    // Smoothly transition the intensity
+    this.backgroundIntensity = this.backgroundIntensity * 0.9 + baseIntensity * 0.1;
+    this.shakeIntensity = this.shakeIntensity * 0.8 + baseIntensity * 0.2;
+    
+    // Apply background color change
+    this.applyBackgroundEffect();
+    
+    // Apply screen shake effect
+    this.applyScreenShake();
+  }
+  
+  /**
+   * Apply background color effect based on intensity
+   */
+  private applyBackgroundEffect(): void {
+    if (this.backgroundIntensity < 0.05) {
+      // Reset to original color if intensity is very low
+      document.body.style.backgroundColor = this.originalBackgroundColor;
+      return;
+    }
+    
+    // Change from normal to a reddish hue as intensity increases
+    const r = 255;
+    const g = Math.floor(255 * (1 - this.backgroundIntensity * 0.7));
+    const b = Math.floor(255 * (1 - this.backgroundIntensity * 0.9));
+    
+    document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+  }
+  
+  /**
+   * Apply screen shake effect based on intensity
+   */
+  private applyScreenShake(): void {
+    if (this.shakeIntensity < 0.1) {
+      // Reset position if intensity is low
+      this.container.style.transform = 'translate(0px, 0px)';
+      return;
+    }
+    
+    // Calculate random offset based on intensity
+    const maxOffset = this.shakeIntensity * 5; // Max 5px offset at full intensity
+    const xOffset = (Math.random() * 2 - 1) * maxOffset;
+    const yOffset = (Math.random() * 2 - 1) * maxOffset;
+    
+    // Apply the shake effect
+    this.container.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
   }
 }
