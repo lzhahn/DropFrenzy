@@ -13,6 +13,8 @@ export class Item {
   speed: number;
   velocityX: number; // Horizontal velocity
   maxHorizontalSpeed: number; // Maximum horizontal speed
+  acceleration: number; // Vertical acceleration
+  maxSpeed: number; // Maximum falling speed
   
   // Value properties
   baseValue: number;
@@ -52,6 +54,8 @@ export class Item {
     // Initialize momentum properties
     this.velocityX = (Math.random() - 0.5) * 20; // Random initial horizontal velocity
     this.maxHorizontalSpeed = 30; // Maximum horizontal speed
+    this.acceleration = 0.5; // Vertical acceleration
+    this.maxSpeed = 800; // Maximum falling speed
     
     // Create the visual element
     this.element = document.createElement('div');
@@ -86,6 +90,20 @@ export class Item {
    */
   update(deltaTime: number): boolean {
     if (this.isCollected) return false;
+    
+    // Apply vertical acceleration based on screen position
+    // Items accelerate more as they fall further down the screen
+    const screenHeight = window.innerHeight;
+    const progressDownScreen = Math.min(1, Math.max(0, this.y / screenHeight));
+    const accelerationFactor = 1 + (progressDownScreen * 2); // Increases from 1 to 3 as item falls
+    
+    // Apply acceleration with the dynamic factor
+    this.speed += this.acceleration * deltaTime * 100 * accelerationFactor;
+    
+    // Limit falling speed
+    if (this.speed > this.maxSpeed) {
+      this.speed = this.maxSpeed;
+    }
     
     // Move down based on speed and time elapsed
     this.y += this.speed * deltaTime;

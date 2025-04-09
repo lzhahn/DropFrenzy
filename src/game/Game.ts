@@ -1,5 +1,6 @@
 import { ItemManager } from './ItemManager';
 import { UpgradeManager } from '../upgrades/UpgradeManager';
+import { ParticleManager } from '../effects/ParticleManager';
 
 /**
  * Main Game class that handles the core game loop and state
@@ -11,12 +12,14 @@ export class Game {
   private currencyDisplay: HTMLElement | null;
   private itemManager: ItemManager;
   private upgradeManager: UpgradeManager;
+  private particleManager: ParticleManager;
   private autoClickTimer: number = 0;
 
   constructor(container: HTMLElement) {
     this.container = container;
     this.currencyDisplay = document.getElementById('currency-value');
     this.itemManager = new ItemManager(container);
+    this.particleManager = new ParticleManager(container);
 
     // Initialize the upgrade manager with currency update callback
     this.upgradeManager = new UpgradeManager(0, () => {
@@ -255,6 +258,9 @@ export class Game {
    * Create visual feedback at click position
    */
   private createClickFeedback(x: number, y: number): void {
+    // Create a small particle burst for regular clicks
+    this.particleManager.createParticleBurst(x, y, 5, '#ffffff');
+    
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = 'click-feedback';
@@ -276,6 +282,9 @@ export class Game {
    * Create critical hit feedback at click position
    */
   private createCriticalHitFeedback(x: number, y: number): void {
+    // Create a larger, golden particle burst for critical hits
+    this.particleManager.createParticleBurst(x, y, 20, '#ffcc00');
+    
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = 'critical-feedback';
@@ -298,6 +307,9 @@ export class Game {
    * Create collection feedback at click position
    */
   private createCollectionFeedback(x: number, y: number, value: number): void {
+    // Create particle burst with the value displayed
+    this.particleManager.createParticleBurst(x, y, 10, '#4a6bff', value);
+    
     // Create feedback element
     const feedback = document.createElement('div');
     feedback.className = 'collection-feedback';

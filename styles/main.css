@@ -249,6 +249,38 @@ main {
   }
 }
 
+/* Particle Effects */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  will-change: transform, opacity;
+}
+
+.floating-text {
+  position: absolute;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 15;
+  will-change: transform, opacity;
+  animation: float-up 1.5s ease-out forwards;
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -30px);
+  }
+}
+
 /* Responsive design for upgrade panel */
 @media (max-width: 768px) {
   .upgrade-panel {
