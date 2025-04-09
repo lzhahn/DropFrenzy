@@ -60,7 +60,36 @@ export class ItemManager {
       }
     });
     
+    // Check for collisions between items
+    this.handleCollisions();
+    
     return missedItems;
+  }
+  
+  /**
+   * Handle collisions between all active items
+   */
+  private handleCollisions(): void {
+    // Get all items as an array for easier iteration
+    const itemsArray = Array.from(this.items.values());
+    
+    // Check each pair of items for collisions
+    for (let i = 0; i < itemsArray.length; i++) {
+      const itemA = itemsArray[i];
+      
+      // Skip collected items
+      if (itemA.isCollected) continue;
+      
+      for (let j = i + 1; j < itemsArray.length; j++) {
+        const itemB = itemsArray[j];
+        
+        // Skip collected items
+        if (itemB.isCollected) continue;
+        
+        // Check for collision between the two items
+        itemA.checkCollision(itemB);
+      }
+    }
   }
   
   /**

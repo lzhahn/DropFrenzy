@@ -27,6 +27,7 @@ export class Item {
   // State
   isCollected: boolean;
   isRising: boolean; // Whether the item is rising from the bottom
+  collisionCooldown: number = 0; // Cooldown to prevent multiple collisions in quick succession
   
   /**
    * Create a new falling item
@@ -154,6 +155,11 @@ export class Item {
     // Update the visual position
     this.updatePosition();
     
+    // Update collision cooldown
+    if (this.collisionCooldown > 0) {
+      this.collisionCooldown -= deltaTime;
+    }
+    
     return true;
   }
   
@@ -212,5 +218,95 @@ export class Item {
     if (this.element.parentNode) {
       this.element.parentNode.removeChild(this.element);
     }
+  }
+  
+  /**
+   * Check for collision with another item
+   * @param other The other item to check collision with
+   * @returns Whether a collision occurred
+   */
+  checkCollision(other: Item): boolean {
+    // Skip if either item is collected or if we're in cooldown
+    if (this.isCollected || other.isCollected || this.collisionCooldown > 0) {
+      return false;
+    }
+    
+    // Simple AABB collision detection
+    const collision = (
+      this.x < other.x + other.width &&
+      this.x + this.width > other.x &&
+      this.y < other.y + other.height &&
+      this.y + this.height > other.y
+    );
+    
+    if (collision) {
+      this.handleCollision(other);
+      return true;
+    }
+    
+    return false;
+  }
+  
+  /**
+   * Handle collision response between this item and another
+   * @param other The other item involved in the collision
+   */
+  handleCollision(other: Item): void {
+    // Set collision cooldown to prevent multiple collisions in quick succession
+    this.collisionCooldown = 0.1; // 100ms cooldown
+    
+    // Calculate collision vector (direction from other to this)
+    const dx = this.x - other.x;
+    const dy = this.y - other.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // Avoid division by zero
+    if (distance === 0) return;
+    
+    // Normalize the collision vector
+    const nx = dx / distance;
+    const ny = dy / distance;
+    
+    // Calculate relative velocity
+    const vx = this.velocityX - other.velocityX;
+    const vy = this.speed * (this.isRising ? -1 : 1) - other.speed * (other.isRising ? -1 : 1);
+    
+    // Calculate velocity along the normal
+    const velocityAlongNormal = vx * nx + vy * ny;
+    
+    // Don't resolve if velocities are separating
+    if (velocityAlongNormal > 0) return;
+    
+    // Calculate impulse scalar (how bouncy the collision is)
+    const restitution = 0.6; // Bounciness factor (0 = no bounce, 1 = perfect bounce)
+    const impulseScalar = -(1 + restitution) * velocityAlongNormal;
+    
+    // Apply impulse to velocities
+    this.velocityX += nx * impulseScalar * 0.5;
+    other.velocityX -= nx * impulseScalar * 0.5;
+    
+    // Adjust vertical speeds (convert to velocityY for calculation)
+    const thisVelocityY = this.speed * (this.isRising ? -1 : 1);
+    const otherVelocityY = other.speed * (other.isRising ? -1 : 1);
+    
+    const newThisVelocityY = thisVelocityY + ny * impulseScalar * 0.5;
+    const newOtherVelocityY = otherVelocityY - ny * impulseScalar * 0.5;
+    
+    // Update speeds based on new velocity directions
+    this.speed = Math.abs(newThisVelocityY) * 0.8; // Reduce speed slightly after collision
+    other.speed = Math.abs(newOtherVelocityY) * 0.8;
+    
+    // Prevent items from getting stuck together by moving them apart slightly
+    const overlap = (this.width + other.width) / 2 - distance;
+    if (overlap > 0) {
+      this.x += nx * overlap * 0.5;
+      this.y += ny * overlap * 0.5;
+      other.x -= nx * overlap * 0.5;
+      other.y -= ny * overlap * 0.5;
+    }
+    
+    // Update positions after collision
+    this.updatePosition();
+    other.updatePosition();
   }
 }
