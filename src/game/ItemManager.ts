@@ -25,15 +25,21 @@ export class ItemManager {
   /**
    * Update all items and spawn new ones based on elapsed time
    * @param deltaTime Time elapsed since last update in seconds
+   * @param risingChance Chance of spawning a rising item (default 0)
    * @returns Array of items that went off-screen without being collected
    */
-  update(deltaTime: number): Item[] {
+  update(deltaTime: number, risingChance: number = 0): Item[] {
     // Update spawn timer
     this.timeSinceLastSpawn += deltaTime;
     
     // Check if it's time to spawn a new item
     if (this.timeSinceLastSpawn >= this.spawnInterval / this.spawnRateMultiplier) {
-      this.spawnItem();
+      // Determine if we should spawn a rising ball
+      if (risingChance > 0 && Math.random() < risingChance) {
+        this.spawnRisingItem();
+      } else {
+        this.spawnItem();
+      }
       this.timeSinceLastSpawn = 0;
     }
     
@@ -45,8 +51,11 @@ export class ItemManager {
       item.update(deltaTime);
       
       // Check if the item has gone off-screen
-      if (item.y > window.innerHeight + item.height && !item.isCollected) {
-        missedItems.push(item);
+      if ((!item.isRising && item.y > window.innerHeight + item.height) || 
+          (item.isRising && item.y < -item.height)) {
+        if (!item.isCollected) {
+          missedItems.push(item);
+        }
         this.removeItem(item.id);
       }
     });
@@ -79,12 +88,44 @@ export class ItemManager {
   }
   
   /**
+   * Spawn a new item at a random X position at the bottom of the window
+   * that will rise upward
+   */
+  private spawnRisingItem(): void {
+    // Generate a random X position within the window
+    const randomX = Math.random() * window.innerWidth;
+    
+    // Create a new item
+    const item = new Item(
+      this.nextItemId.toString(),
+      randomX,
+      window.innerHeight + 20, // Start slightly below the window
+      this.baseSpeed * this.speedMultiplier * 0.8, // Slightly slower than falling items
+      this.baseValue, // Base value will be multiplied by rising value multiplier when collected
+      this.container
+    );
+    
+    // Set this item to rise
+    item.isRising = true;
+    
+    // Add special visual class for rising items
+    item.element.classList.add('rising-item');
+    
+    // Add to the items map
+    this.items.set(item.id, item);
+    
+    // Increment the ID counter
+    this.nextItemId++;
+  }
+  
+  /**
    * Collect an item at the specified coordinates
    * @param x X coordinate
    * @param y Y coordinate
+   * @param risingValueMultiplier Value multiplier for rising items (default 1.0)
    * @returns The value of the collected item, or 0 if no item was collected
    */
-  collectItemAt(x: number, y: number): number {
+  collectItemAt(x: number, y: number, risingValueMultiplier: number = 1.0): number {
     // Check each item to see if it contains the point
     let collectedValue = 0;
     let collectedItem = null;
@@ -99,9 +140,14 @@ export class ItemManager {
     
     // If we found an item, collect it
     if (collectedItem) {
-      // Get the base value without applying multiplier here
-      // The Game class will apply the appropriate multipliers
-      collectedValue = collectedItem.collect();
+      // Mark the item as collected
+      collectedItem.collect();
+      
+      // Apply value multiplier for rising items
+      const valueMultiplier = collectedItem.isRising ? risingValueMultiplier : 1.0;
+      
+      // Return the base value of the item (will be multiplied by the game's value multiplier)
+      collectedValue = collectedItem.getValue() * valueMultiplier;
     }
     
     return collectedValue;

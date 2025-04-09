@@ -127,13 +127,46 @@ export class CriticalChanceUpgrade extends BaseUpgrade {
    * Get the current critical chance (0-1)
    */
   getCriticalChance(): number {
-    return this.getCurrentEffect();
+    return Math.min(0.8, this.getCurrentEffect()); // Cap at 80%
   }
   
   /**
    * Get the critical multiplier value
    */
   getCriticalMultiplier(): number {
-    return 3.0; // Critical hits are worth 3x normal value
+    return 3.0; // Fixed 3x multiplier for critical hits
+  }
+}
+
+/**
+ * RisingBalls upgrade - chance for balls to rise from the bottom of the screen
+ */
+export class RisingBallsUpgrade extends BaseUpgrade {
+  constructor() {
+    super(
+      'rising_balls',
+      UpgradeType.RISING_BALLS,
+      'Rising Balls',
+      'Chance for balls to rise from the bottom of the screen',
+      25, // Base cost
+      1.3, // Cost multiplier
+      0.1, // Base effect (10% chance of rising balls)
+      1.3, // Effect multiplier
+      15  // Max level
+    );
+  }
+  
+  /**
+   * Get the current chance for balls to rise from the bottom (0-1)
+   */
+  getRisingChance(): number {
+    return Math.min(0.5, this.getCurrentEffect()); // Cap at 50%
+  }
+  
+  /**
+   * Get the value multiplier for rising balls
+   */
+  getRisingValueMultiplier(): number {
+    return 1.5; // Rising balls are worth 50% more
   }
 }

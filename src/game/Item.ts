@@ -26,6 +26,7 @@ export class Item {
   
   // State
   isCollected: boolean;
+  isRising: boolean; // Whether the item is rising from the bottom
   
   /**
    * Create a new falling item
@@ -50,6 +51,7 @@ export class Item {
     this.speed = speed;
     this.baseValue = baseValue;
     this.isCollected = false;
+    this.isRising = false;
     
     // Initialize momentum properties
     this.velocityX = (Math.random() - 0.5) * 20; // Random initial horizontal velocity
@@ -91,51 +93,68 @@ export class Item {
   update(deltaTime: number): boolean {
     if (this.isCollected) return false;
     
-    // Apply vertical acceleration based on screen position
-    // Items accelerate more as they fall further down the screen
-    const screenHeight = window.innerHeight;
-    const progressDownScreen = Math.min(1, Math.max(0, this.y / screenHeight));
-    const accelerationFactor = 1 + (progressDownScreen * 2); // Increases from 1 to 3 as item falls
-    
-    // Apply acceleration with the dynamic factor
-    this.speed += this.acceleration * deltaTime * 100 * accelerationFactor;
-    
-    // Limit falling speed
-    if (this.speed > this.maxSpeed) {
-      this.speed = this.maxSpeed;
+    if (this.isRising) {
+      // For rising balls, we move upward and slow down as they rise
+      const screenHeight = window.innerHeight;
+      const progressUpScreen = Math.min(1, Math.max(0, 1 - (this.y / screenHeight)));
+      const decelerationFactor = 1 + (progressUpScreen * 2); // Increases from 1 to 3 as item rises
+      
+      // Apply deceleration with the dynamic factor
+      this.speed -= this.acceleration * deltaTime * 50 * decelerationFactor;
+      
+      // Ensure minimum speed
+      if (this.speed < 50) {
+        this.speed = 50;
+      }
+      
+      // Move up based on speed and time elapsed
+      this.y -= this.speed * deltaTime;
+    } else {
+      // Apply vertical acceleration based on screen position
+      // Items accelerate more as they fall further down the screen
+      const screenHeight = window.innerHeight;
+      const progressDownScreen = Math.min(1, Math.max(0, this.y / screenHeight));
+      const accelerationFactor = 1 + (progressDownScreen * 2); // Increases from 1 to 3 as item falls
+      
+      // Apply acceleration with the dynamic factor
+      this.speed += this.acceleration * deltaTime * 100 * accelerationFactor;
+      
+      // Limit falling speed
+      if (this.speed > this.maxSpeed) {
+        this.speed = this.maxSpeed;
+      }
+      
+      // Move down based on speed and time elapsed
+      this.y += this.speed * deltaTime;
     }
     
-    // Move down based on speed and time elapsed
-    this.y += this.speed * deltaTime;
-    
-    // Apply horizontal movement with momentum
+    // Apply horizontal movement with bouncing off edges
     this.x += this.velocityX * deltaTime;
     
-    // Add slight swaying motion
-    this.velocityX += (Math.random() - 0.5) * 5 * deltaTime;
+    // Bounce off left edge
+    if (this.x < 0) {
+      this.x = 0;
+      this.velocityX = -this.velocityX * 0.8; // Dampen the bounce
+    }
+    
+    // Bounce off right edge
+    if (this.x > window.innerWidth - this.width) {
+      this.x = window.innerWidth - this.width;
+      this.velocityX = -this.velocityX * 0.8; // Dampen the bounce
+    }
+    
+    // Apply horizontal drag
+    this.velocityX *= 0.99;
     
     // Limit horizontal speed
-    if (this.velocityX > this.maxHorizontalSpeed) {
-      this.velocityX = this.maxHorizontalSpeed;
-    } else if (this.velocityX < -this.maxHorizontalSpeed) {
-      this.velocityX = -this.maxHorizontalSpeed;
+    if (Math.abs(this.velocityX) > this.maxHorizontalSpeed) {
+      this.velocityX = this.maxHorizontalSpeed * Math.sign(this.velocityX);
     }
     
-    // Bounce off the edges of the screen
-    const windowWidth = window.innerWidth;
-    if (this.x < this.width / 2) {
-      this.x = this.width / 2;
-      this.velocityX = Math.abs(this.velocityX) * 0.8; // Reduce speed slightly on bounce
-    } else if (this.x > windowWidth - this.width / 2) {
-      this.x = windowWidth - this.width / 2;
-      this.velocityX = -Math.abs(this.velocityX) * 0.8; // Reduce speed slightly on bounce
-    }
-    
+    // Update the visual position
     this.updatePosition();
     
-    // Return whether the item is still within bounds
-    // This will be checked by the game to determine if the item should be removed
-    return this.y < window.innerHeight + this.height;
+    return true;
   }
   
   /**
@@ -159,24 +178,30 @@ export class Item {
   }
   
   /**
-   * Mark the item as collected and animate its collection
-   * @returns The value of the collected item
+   * Mark the item as collected and return its value
+   * @returns The base value of the item
    */
   collect(): number {
-    if (this.isCollected) return 0;
+    if (!this.isCollected) {
+      this.isCollected = true;
+      this.element.classList.add('collected');
+      
+      // Remove the element after the collection animation
+      setTimeout(() => {
+        if (this.element.parentNode) {
+          this.element.parentNode.removeChild(this.element);
+        }
+      }, 500);
+    }
     
-    this.isCollected = true;
-    
-    // Add collection animation class
-    this.element.classList.add('collected');
-    
-    // Remove the element after animation completes
-    setTimeout(() => {
-      if (this.element.parentNode) {
-        this.element.parentNode.removeChild(this.element);
-      }
-    }, 300); // Match this with CSS animation duration
-    
+    return this.baseValue;
+  }
+  
+  /**
+   * Get the base value of the item
+   * @returns The base value of the item
+   */
+  getValue(): number {
     return this.baseValue;
   }
   

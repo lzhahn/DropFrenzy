@@ -91,12 +91,12 @@ export class Game {
   private update(deltaTime: number): void {
     // Apply upgrade effects
     this.applyUpgradeEffects();
-
-    // Handle auto-clicking if the upgrade is active
+    
+    // Update items and get missed items
+    this.itemManager.update(deltaTime, this.upgradeManager.getRisingChance());
+    
+    // Handle auto-clicker
     this.handleAutoClicker(deltaTime);
-
-    // Update items (spawn new ones, move existing ones)
-    this.itemManager.update(deltaTime);
   }
 
   /**
@@ -149,54 +149,47 @@ export class Game {
     const itemsToCollect = Math.min(count, items.length);
     
     // Sort items by how close they are to the bottom of the screen
-    // This prioritizes items that are about to disappear
-    items.sort((a, b) => b.y - a.y);
+    // This makes the auto-clicker prioritize items that are about to be missed
+    items.sort((a, b) => {
+      if (a.isRising && !b.isRising) return -1; // Prioritize rising items
+      if (!a.isRising && b.isRising) return 1;
+      
+      if (a.isRising) {
+        // For rising items, prioritize ones closer to the top (lower y value)
+        return a.y - b.y;
+      } else {
+        // For falling items, prioritize ones closer to the bottom (higher y value)
+        return b.y - a.y;
+      }
+    });
+
+    // Collect the items
+    let totalValue = 0;
+    const risingValueMultiplier = this.upgradeManager.getRisingValueMultiplier();
+    const valueMultiplier = this.upgradeManager.getValueMultiplier();
     
-    // Collect the determined number of items
-    let collectedCount = 0;
-    for (let i = 0; i < items.length && collectedCount < itemsToCollect; i++) {
+    for (let i = 0; i < itemsToCollect; i++) {
       const item = items[i];
       
-      // Skip if the item has already been collected
-      if (item.isCollected) continue;
+      // Mark the item as collected
+      item.collect();
       
-      // Calculate the center point of the item
-      const centerX = item.x + item.width / 2;
-      const centerY = item.y + item.height / 2;
-      
-      // Collect the item directly using its center point
-      const value = this.itemManager.collectItemAt(centerX, centerY);
-
-      if (value > 0) {
-        collectedCount++;
-        
-        // Apply the value multiplier from upgrade manager
-        const valueMultiplier = this.upgradeManager.getValueMultiplier();
-        let finalValue = Math.round(value * valueMultiplier);
-        
-        // Check for critical hit based on upgrade
-        const criticalChance = this.upgradeManager.getCriticalChance();
-
-        if (Math.random() < criticalChance) {
-          // Critical hit! Use the multiplier from upgrade manager
-          const critMultiplier = this.upgradeManager.getCriticalMultiplier();
-          finalValue = Math.round(finalValue * critMultiplier);
-
-          // Create visual feedback at the item's position
-          this.createCriticalHitFeedback(centerX, centerY);
-        } else {
-          // Create regular collection feedback
-          this.createCollectionFeedback(centerX, centerY, finalValue);
-        }
-
-        // If an item was collected, add its value to currency
-        this.addCurrency(finalValue);
+      // Apply value multiplier for rising items
+      let itemValue = item.getValue();
+      if (item.isRising) {
+        itemValue *= risingValueMultiplier;
       }
+      
+      // Apply the regular value multiplier
+      totalValue += Math.round(itemValue * valueMultiplier);
+      
+      // Create a collection effect at the item's position
+      this.createCollectionFeedback(item.x + item.width / 2, item.y + item.height / 2, Math.round(itemValue * valueMultiplier));
     }
-    
-    // Debug logging to help identify issues
-    if (collectedCount === 0 && items.length > 0) {
-      console.log(`Auto collector failed to collect any items. Available: ${items.length}, Attempted: ${itemsToCollect}`);
+
+    // Add the total value to currency
+    if (totalValue > 0) {
+      this.addCurrency(totalValue);
     }
   }
 
@@ -205,7 +198,11 @@ export class Game {
    */
   private handleClick(event: MouseEvent): void {
     // Try to collect an item at the click position
-    const value = this.itemManager.collectItemAt(event.clientX, event.clientY);
+    const value = this.itemManager.collectItemAt(
+      event.clientX, 
+      event.clientY,
+      this.upgradeManager.getRisingValueMultiplier()
+    );
 
     if (value > 0) {
       // Apply the value multiplier from upgrade manager

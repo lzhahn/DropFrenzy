@@ -4,7 +4,8 @@ import {
   MultiplierUpgrade, 
   DropRateUpgrade, 
   GravityUpgrade, 
-  CriticalChanceUpgrade 
+  CriticalChanceUpgrade,
+  RisingBallsUpgrade
 } from './UpgradeTypes';
 
 /**
@@ -33,7 +34,8 @@ export class UpgradeManager {
       new MultiplierUpgrade(),
       new DropRateUpgrade(),
       new GravityUpgrade(),
-      new CriticalChanceUpgrade()
+      new CriticalChanceUpgrade(),
+      new RisingBallsUpgrade()
     ];
     
     // Add all upgrades to the map
@@ -196,8 +198,24 @@ export class UpgradeManager {
    * Get the critical hit multiplier
    */
   getCriticalMultiplier(): number {
-    const criticalUpgrade = this.getUpgradeByType(UpgradeType.CRITICAL_CHANCE) as CriticalChanceUpgrade;
-    return criticalUpgrade ? criticalUpgrade.getCriticalMultiplier() : 3.0;
+    const upgrade = this.getUpgradeByType(UpgradeType.CRITICAL_CHANCE) as CriticalChanceUpgrade;
+    return upgrade ? upgrade.getCriticalMultiplier() : 3.0;
+  }
+
+  /**
+   * Get the chance for balls to rise from the bottom
+   */
+  getRisingChance(): number {
+    const upgrade = this.getUpgradeByType(UpgradeType.RISING_BALLS) as RisingBallsUpgrade;
+    return upgrade ? upgrade.getRisingChance() : 0;
+  }
+
+  /**
+   * Get the value multiplier for rising balls
+   */
+  getRisingValueMultiplier(): number {
+    const upgrade = this.getUpgradeByType(UpgradeType.RISING_BALLS) as RisingBallsUpgrade;
+    return upgrade ? upgrade.getRisingValueMultiplier() : 1.0;
   }
   
   /**

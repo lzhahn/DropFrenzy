@@ -242,6 +242,8 @@ export class UpgradePanel {
         return `${effect.toFixed(2)}x speed`;
       case 'critical_chance':
         return `${(effect * 100).toFixed(1)}% chance`;
+      case 'rising_balls':
+        return `${(effect * 100).toFixed(1)}% chance, 1.5x value`;
       default:
         return effect.toString();
     }
