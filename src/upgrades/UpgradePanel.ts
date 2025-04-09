@@ -131,8 +131,17 @@ export class UpgradePanel {
     
     const buyButton = document.createElement('button');
     buyButton.className = 'upgrade-buy-button';
-    buyButton.textContent = 'Buy';
-    buyButton.disabled = !this.upgradeManager.canPurchaseUpgrade(upgrade.id);
+    
+    // Check if the upgrade is at max level
+    if (upgrade.level >= upgrade.maxLevel) {
+      buyButton.textContent = 'MAX';
+      buyButton.disabled = true;
+      costLabel.style.display = 'none';
+      costValue.style.display = 'none';
+    } else {
+      buyButton.textContent = 'Buy';
+      buyButton.disabled = !this.upgradeManager.canPurchaseUpgrade(upgrade.id);
+    }
     
     // Add click event to buy button
     buyButton.addEventListener('click', () => {
@@ -175,13 +184,30 @@ export class UpgradePanel {
     // Update buy button
     const buyButton = element.querySelector('.upgrade-buy-button') as HTMLButtonElement;
     if (buyButton) {
-      buyButton.disabled = !this.upgradeManager.canPurchaseUpgrade(upgrade.id);
-      
-      // Add or remove the 'affordable' class based on whether the upgrade can be purchased
-      if (this.upgradeManager.canPurchaseUpgrade(upgrade.id)) {
-        buyButton.classList.add('affordable');
+      // Check if the upgrade is at max level
+      if (upgrade.level >= upgrade.maxLevel) {
+        buyButton.textContent = 'MAX';
+        buyButton.disabled = true;
+        
+        // Hide cost display
+        const costLabel = element.querySelector('.upgrade-buy-container span:first-child');
+        if (costLabel) {
+          (costLabel as HTMLElement).style.display = 'none';
+        }
+        
+        if (costElement) {
+          (costElement as HTMLElement).style.display = 'none';
+        }
       } else {
-        buyButton.classList.remove('affordable');
+        buyButton.textContent = 'Buy';
+        buyButton.disabled = !this.upgradeManager.canPurchaseUpgrade(upgrade.id);
+        
+        // Add or remove the 'affordable' class based on whether the upgrade can be purchased
+        if (this.upgradeManager.canPurchaseUpgrade(upgrade.id)) {
+          buyButton.classList.add('affordable');
+        } else {
+          buyButton.classList.remove('affordable');
+        }
       }
     }
   }
@@ -243,7 +269,9 @@ export class UpgradePanel {
       case 'critical_chance':
         return `${(effect * 100).toFixed(1)}% chance`;
       case 'rising_balls':
-        return `${(effect * 100).toFixed(1)}% chance, 1.5x value`;
+        // Apply the same 25% cap that's in the getRisingChance method
+        const cappedEffect = Math.min(0.25, effect);
+        return `${(cappedEffect * 100).toFixed(1)}% chance, 1.5x value`;
       case 'rising_auto_clicker':
         return `${effect.toFixed(1)} rising items/sec`;
       default:

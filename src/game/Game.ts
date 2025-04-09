@@ -36,7 +36,7 @@ export class Game {
   private init(): void {
     // Set up click event listener on the entire document
     document.addEventListener('click', this.handleClick.bind(this));
-
+    
     // Initialize currency display
     this.updateCurrencyDisplay();
   }

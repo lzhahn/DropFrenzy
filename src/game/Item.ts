@@ -95,21 +95,23 @@ export class Item {
     if (this.isCollected) return false;
     
     if (this.isRising) {
-      // For rising balls, we move upward and slow down as they rise
+      // For rising balls, we move upward and accelerate as they rise
       const screenHeight = window.innerHeight;
       const progressUpScreen = Math.min(1, Math.max(0, 1 - (this.y / screenHeight)));
-      const decelerationFactor = 1 + (progressUpScreen * 2); // Increases from 1 to 3 as item rises
       
-      // Apply deceleration with the dynamic factor
-      this.speed -= this.acceleration * deltaTime * 50 * decelerationFactor;
+      // Accelerate as the ball rises (starts at base speed, increases up to 3x at top)
+      const speedFactor = 1 + (progressUpScreen * 2);
       
-      // Ensure minimum speed
-      if (this.speed < 50) {
-        this.speed = 50;
+      // Move upward with the calculated speed
+      this.y -= this.speed * speedFactor * deltaTime;
+      
+      // Apply horizontal movement with bouncing off edges
+      this.x += this.velocityX * deltaTime;
+      
+      // Check if the item has gone off the top of the screen
+      if (this.y < -this.height) {
+        return false; // Remove the item
       }
-      
-      // Move up based on speed and time elapsed
-      this.y -= this.speed * deltaTime;
     } else {
       // Apply vertical acceleration based on screen position
       // Items accelerate more as they fall further down the screen
@@ -128,9 +130,6 @@ export class Item {
       // Move down based on speed and time elapsed
       this.y += this.speed * deltaTime;
     }
-    
-    // Apply horizontal movement with bouncing off edges
-    this.x += this.velocityX * deltaTime;
     
     // Bounce off left edge
     if (this.x < 0) {

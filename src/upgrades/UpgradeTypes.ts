@@ -152,7 +152,7 @@ export class RisingBallsUpgrade extends BaseUpgrade {
       1.3, // Cost multiplier
       0.1, // Base effect (10% chance of rising balls)
       1.3, // Effect multiplier
-      15  // Max level
+      5  // Max level
     );
   }
   
@@ -160,7 +160,7 @@ export class RisingBallsUpgrade extends BaseUpgrade {
    * Get the current chance for balls to rise from the bottom (0-1)
    */
   getRisingChance(): number {
-    return Math.min(0.5, this.getCurrentEffect()); // Cap at 50%
+    return Math.min(0.25, this.getCurrentEffect()); // Cap at 25%
   }
   
   /**
@@ -185,7 +185,7 @@ export class RisingAutoClickerUpgrade extends BaseUpgrade {
       1.35, // Cost multiplier
       0.2, // Base effect (0.2 rising balls per second)
       1.25, // Effect multiplier
-      20  // Max level
+      7  // Max level - reduced from 20 to 7
     );
   }
   

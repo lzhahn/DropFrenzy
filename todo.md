@@ -49,14 +49,14 @@
 - [x] Implement cost scaling per level
 
 ### 🎨 Upgrade UX
-- [ ] Add tooltips or short descriptions
-- [ ] Show upgrade level and effect
+- [x] Add tooltips or short descriptions
+- [x] Show upgrade level and effect
 
 ---
 
 ## ⚙️ Game Scaling & Pacing
-- [ ] Link upgrades to speed, value, and frequency
-- [ ] Create scaling/difficulty curve (exponential/logarithmic)
+- [x] Link upgrades to speed, value, and frequency
+- [x] Create scaling/difficulty curve (exponential/logarithmic)
 - [ ] Add visual cues as pace increases (blur, background, shake, etc.)
 
 ---
@@ -73,15 +73,15 @@
 ## ✨ UI & Visuals
 
 ### 📱 Game Interface
-- [ ] HUD with currency display
-- [ ] Main item drop area
-- [ ] Upgrade panel (side or bottom)
+- [x] HUD with currency display
+- [x] Main item drop area
+- [x] Upgrade panel (side or bottom)
 - [ ] Settings button (reset, export)
 
 ### 🖼️ Visual Feedback
-- [ ] Animate item collection (e.g., fade or pop)
-- [ ] Highlight affordable upgrades
-- [ ] Add visual effect for rare/critical items
+- [x] Animate item collection (e.g., fade or pop)
+- [x] Highlight affordable upgrades
+- [x] Add visual effect for rare/critical items
 - [ ] Evolve background visuals over time
 
 ---
@@ -114,7 +114,7 @@
 ---
 
 ## 🎁 Post-MVP Features
-- [ ] Add item types/rarities with unique visuals
+- [x] Add item types/rarities with unique visuals
 - [ ] Unlockable themes/backgrounds
 - [ ] Add player stats (items collected, upgrades, etc.)
 - [ ] Track session time or AFK mode
@@ -126,5 +126,12 @@
 - [ ] Add favicon and metadata
 - [ ] Optional: Add PWA mobile support
 - [ ] Add easter eggs or secrets
-- [ ] Animate upgrade buttons when affordable
-- [ ] Add drop trails, sparkles, or other FX
+- [x] Animate upgrade buttons when affordable
+- [x] Add drop trails, sparkles, or other FX
+
+## 🆕 Additional Features
+- [x] Rising balls that move upward from the bottom of the screen
+- [x] Collision detection between balls
+- [x] Separate auto-clickers for falling and rising balls
+- [x] Capped upgrade levels for balance (Rising Balls: 5, Rising Auto-Clicker: 7)
+- [x] Rising balls accelerate as they move higher on the screen
