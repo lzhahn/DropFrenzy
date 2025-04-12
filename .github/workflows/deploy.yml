@@ -36,7 +36,9 @@ jobs:
           fi
       
       - name: Build
-        run: npm run build
+        run: |
+          # Set base path for GitHub Pages
+          npm run build -- --base=./
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
