@@ -37,8 +37,8 @@ jobs:
       
       - name: Build
         run: |
-          # Set base path for GitHub Pages
-          npm run build -- --base=./
+          # Use the production Vite configuration
+          npx vite build --config vite.config.prod.js
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
