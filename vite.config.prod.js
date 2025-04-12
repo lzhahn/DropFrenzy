@@ -16,7 +16,7 @@ export default defineConfig({
     // Simplify output structure for GitHub Pages
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // Ensure assets are referenced correctly with relative paths
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]'
