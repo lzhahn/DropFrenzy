@@ -20,7 +20,6 @@ export class Game {
   
   // Visual cue properties
   private backgroundIntensity: number = 0;
-  private shakeIntensity: number = 0;
   private originalBackgroundColor: string = '';
 
   constructor(container: HTMLElement) {
@@ -138,9 +137,7 @@ export class Game {
     
     // Reset visual effects
     this.backgroundIntensity = 0;
-    this.shakeIntensity = 0;
     document.body.style.backgroundColor = this.originalBackgroundColor;
-    this.container.style.transform = 'translate(0px, 0px)';
     
     console.log('Game stopped');
   }
@@ -485,13 +482,9 @@ export class Game {
     
     // Smoothly transition the intensity
     this.backgroundIntensity = this.backgroundIntensity * 0.9 + baseIntensity * 0.1;
-    this.shakeIntensity = this.shakeIntensity * 0.8 + baseIntensity * 0.2;
     
     // Apply background color change
     this.applyBackgroundEffect();
-    
-    // Apply screen shake effect
-    this.applyScreenShake();
   }
   
   /**
@@ -510,24 +503,5 @@ export class Game {
     const b = Math.floor(255 * (1 - this.backgroundIntensity * 0.9));
     
     document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-  }
-  
-  /**
-   * Apply screen shake effect based on intensity
-   */
-  private applyScreenShake(): void {
-    if (this.shakeIntensity < 0.1) {
-      // Reset position if intensity is low
-      this.container.style.transform = 'translate(0px, 0px)';
-      return;
-    }
-    
-    // Calculate random offset based on intensity
-    const maxOffset = this.shakeIntensity * 5; // Max 5px offset at full intensity
-    const xOffset = (Math.random() * 2 - 1) * maxOffset;
-    const yOffset = (Math.random() * 2 - 1) * maxOffset;
-    
-    // Apply the shake effect
-    this.container.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
   }
 }
