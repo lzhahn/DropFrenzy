@@ -171,8 +171,10 @@ export class Item {
   containsPoint(pointX: number, pointY: number): boolean {
     // The item's position (this.x, this.y) is the center of the item
     // We need to calculate the bounds based on the center
-    const halfWidth = this.width / 2;
-    const halfHeight = this.height / 2;
+    // Add a larger clickable area (20px extra in all directions)
+    const clickableAreaExtension = 20;
+    const halfWidth = (this.width / 2) + clickableAreaExtension;
+    const halfHeight = (this.height / 2) + clickableAreaExtension;
     
     return (
       pointX >= this.x - halfWidth &&

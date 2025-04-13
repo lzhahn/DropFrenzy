@@ -408,6 +408,17 @@ footer {
   animation: float 3s infinite ease-in-out;
 }
 
+.game-item::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border-radius: 50%;
+  z-index: -1;
+}
+
 @keyframes float {
   0%, 100% {
     transform: translate(-50%, -50%) rotate(0deg);
