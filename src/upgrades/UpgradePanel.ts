@@ -8,6 +8,8 @@ export class UpgradePanel {
   private upgradeManager: UpgradeManager;
   private panelElement!: HTMLElement; // Using definite assignment assertion
   private upgradeElements: Map<string, HTMLElement> = new Map();
+  private collapseButton: HTMLElement | null = null;
+  private isCollapsed: boolean = false;
   
   constructor(_parentElement: HTMLElement, upgradeManager: UpgradeManager) {
     this.upgradeManager = upgradeManager;
@@ -27,11 +29,50 @@ export class UpgradePanel {
       upgradesList.innerHTML = '';
     }
     
+    // Set up the collapse button functionality
+    this.setupCollapseButton();
+    
     // Initialize the panel with all upgrades
     this.initializeUpgrades();
     
     // Set up update interval to refresh UI
     setInterval(() => this.updateUpgradeUI(), 500);
+  }
+  
+  /**
+   * Set up the collapse button functionality
+   */
+  private setupCollapseButton(): void {
+    this.collapseButton = this.panelElement.querySelector('#collapse-upgrades');
+    
+    if (this.collapseButton) {
+      this.collapseButton.addEventListener('click', () => {
+        this.toggleCollapse();
+      });
+      
+      // Check for saved state in localStorage
+      const savedState = localStorage.getItem('upgradesPanelCollapsed');
+      if (savedState === 'true') {
+        this.isCollapsed = true;
+        this.panelElement.classList.add('collapsed');
+      }
+    }
+  }
+  
+  /**
+   * Toggle the collapsed state of the upgrades panel
+   */
+  private toggleCollapse(): void {
+    this.isCollapsed = !this.isCollapsed;
+    
+    if (this.isCollapsed) {
+      this.panelElement.classList.add('collapsed');
+    } else {
+      this.panelElement.classList.remove('collapsed');
+    }
+    
+    // Save state to localStorage
+    localStorage.setItem('upgradesPanelCollapsed', this.isCollapsed.toString());
   }
   
   /**
