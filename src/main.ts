@@ -1,6 +1,7 @@
 import '../styles/main.css';
 import { Game } from './game/Game';
 import { UpgradePanel } from './upgrades/UpgradePanel';
+import { SaveControls } from './ui/SaveControls';
 
 // Initialize the game when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the upgrade panel with the existing panel in the HTML
   new UpgradePanel(document.body, game.getUpgradeManager());
   
+  // Initialize the save controls
+  new SaveControls(game);
+  
   // For debugging purposes
-  console.log('Drop Frenzy initialized with upgrades');
+  console.log('Drop Frenzy initialized with upgrades and save system');
 });

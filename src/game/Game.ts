@@ -1,6 +1,7 @@
 import { ItemManager } from './ItemManager';
 import { UpgradeManager } from '../upgrades/UpgradeManager';
 import { ParticleManager } from '../effects/ParticleManager';
+import { SaveManager } from './SaveManager';
 
 /**
  * Main Game class that handles the core game loop and state
@@ -13,6 +14,7 @@ export class Game {
   private itemManager: ItemManager;
   private upgradeManager: UpgradeManager;
   private particleManager: ParticleManager;
+  private saveManager: SaveManager;
   private autoClickTimer: number = 0;
   private risingAutoClickTimer: number = 0; // Timer for rising auto-clicker
   
@@ -32,6 +34,9 @@ export class Game {
       this.updateCurrencyDisplay();
     });
     
+    // Initialize the save manager
+    this.saveManager = new SaveManager(this.upgradeManager);
+    
     // Store the original background color
     this.originalBackgroundColor = window.getComputedStyle(document.body).backgroundColor;
 
@@ -45,8 +50,48 @@ export class Game {
     // Set up click event listener on the entire document
     document.addEventListener('click', this.handleClick.bind(this));
     
+    // Try to load saved game state
+    this.loadSavedGame();
+    
     // Initialize currency display
     this.updateCurrencyDisplay();
+    
+    // Set up beforeunload event to save the game when the user leaves
+    window.addEventListener('beforeunload', () => {
+      this.saveManager.saveGame();
+    });
+  }
+
+  /**
+   * Load the saved game state if it exists
+   */
+  private loadSavedGame(): void {
+    if (this.saveManager.hasSave()) {
+      const loaded = this.saveManager.loadGame();
+      if (loaded) {
+        this.showSaveLoadNotification('Game progress loaded!');
+      }
+    }
+  }
+  
+  /**
+   * Show a notification about save/load status
+   */
+  private showSaveLoadNotification(message: string): void {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'game-notification';
+    notification.textContent = message;
+    
+    // Add to container
+    document.body.appendChild(notification);
+    
+    // Remove after a delay
+    setTimeout(() => {
+      if (notification.parentNode === document.body) {
+        document.body.removeChild(notification);
+      }
+    }, 3000);
   }
 
   /**
@@ -54,6 +99,13 @@ export class Game {
    */
   getUpgradeManager(): UpgradeManager {
     return this.upgradeManager;
+  }
+  
+  /**
+   * Get the save manager instance
+   */
+  getSaveManager(): SaveManager {
+    return this.saveManager;
   }
 
   /**
@@ -65,6 +117,9 @@ export class Game {
     this.isRunning = true;
     this.lastTimestamp = performance.now();
     requestAnimationFrame(this.gameLoop.bind(this));
+    
+    // Start auto-saving
+    this.saveManager.startAutoSave();
 
     console.log('Game started');
   }
@@ -74,6 +129,12 @@ export class Game {
    */
   public stop(): void {
     this.isRunning = false;
+    
+    // Stop auto-saving
+    this.saveManager.stopAutoSave();
+    
+    // Save the game state before stopping
+    this.saveManager.saveGame();
     
     // Reset visual effects
     this.backgroundIntensity = 0;
