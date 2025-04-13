@@ -102,6 +102,36 @@
 
 ---
 
+## 🎨 Customization & Progression
+
+### 🏪 Ball Shop
+- [ ] Create a store interface for ball customization
+- [ ] Add different ball designs (colors, patterns, effects)
+- [ ] Implement purchase system using in-game currency
+- [ ] Add preview functionality for ball designs
+- [ ] Save selected ball customizations
+
+### 📈 Player Progression
+- [ ] Add player level system that increases with each ball click
+- [ ] Create level-up rewards and visual effects
+- [ ] Display current level prominently in UI
+- [ ] Implement level-based unlocks for special features
+
+### ✨ Special Events
+- [ ] Add rare golden ball with special visual effects
+- [ ] Implement "ball shower" event triggered by golden ball
+- [ ] Create time-limited bonus periods
+- [ ] Add seasonal or timed special events
+
+### 🏆 Achievements
+- [ ] Implement achievement system with rewards
+- [ ] Add milestone achievements (first ball, 69 balls, 1000 balls, etc.)
+- [ ] Create collection-based achievements (collect all ball types)
+- [ ] Add UI for viewing achievements and progress
+- [ ] Implement achievement notifications
+
+---
+
 ## 🧪 Testing & Optimization
 - [x] Unit tests for core components (Item, ItemManager, Game)
 - [ ] Test on Chrome, Firefox, Edge (desktop)
